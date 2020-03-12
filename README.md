@@ -1,4 +1,4 @@
-# Final-Project-Crypto BIAIS Valentine KEBRAT Erwan HARAJ TOUZANI Younes 
+# Final-Project-Crypto BIAIS Valentine KEBRAT Erwan HARAJ TOUZANI Younes RIEUL Thibault
 
 # Theoretical Questions
 
