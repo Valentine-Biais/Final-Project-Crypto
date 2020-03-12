@@ -1,12 +1,43 @@
 import pandas as pd 
+import numpy as np
 
-# import the full dataset
-df = pd.read_csv('database.txt', names = ['Email', 'Password', 'AccountNumber', 'Balance']) # dataframe
-print(df)
+def main():
+    # import the full dataset
+    df = pd.read_csv('database.txt', names = ['Email', 'Password', 'AccountNumber', 'Balance']) # dataframe
+    print(df)
 
-def checkBalance(accountNumber, amount):
+    accountSender = 'A002'
 
-    a = df[(df['AccountNumber'] == accountNumber) & (df['Balance'] >= amount)]
+    correctId, user = checkId(df, 'A', 123456)
+    print(user)
+
+    if correctId:
+        if checkSender(user, accountSender):
+            valid, a = checkBalance(df, accountSender, 28)
+
+            if valid:
+                df = updateDataset(df, a, 'B001', 28)
+
+def checkBalance(df, accountNumber, amount):
+
+    a = df[(df['AccountNumber'] == accountNumber) & (df['Balance'] >= amount)] # Row of sender A
+
+    if not a.empty:
+        return True, a
+    else:
+        return False, a
+
+def checkId(df, email, password):
+
+    a = df[(df['Email'] == email) & (df['Password'] == password)] # Row of sender A
+
+    if not a.empty:
+        return True, a
+    else:
+        return False, a
+
+def checkSender(user, accountSender):
+    a = user[user['AccountNumber'] == accountSender]
     print(a)
 
     if not a.empty:
@@ -14,19 +45,15 @@ def checkBalance(accountNumber, amount):
     else:
         return False
 
-def checkId(email, password):
+def updateDataset(df, a, to, amount):
 
-    a = df[(df['Email'] == email) & (df['Password'] == password)]
-    print(a)
+    c = df[df['AccountNumber'] == to] # Row of receiver C
 
-    if not a.empty:
-        return True
-    else:
-        return False
+    df.loc[a.index[0], 'Balance'] -= amount
+    df.loc[c.index[0], 'Balance'] += amount
+    print(df)
+    df.to_csv('result.txt', header=None, index=None, sep=',', mode='a')
 
-def updateDataset(self, to, amount):
-    a = 0
-    return a
+    return df
 
-print(checkBalance('A002', 28))
-print(checkBalance('A002', 2034))
+main()
