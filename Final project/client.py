@@ -4,6 +4,8 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 import pandas as pd 
+import json
+from cryptography.fernet import Fernet
 
 # import the full dataset
 df = pd.read_csv('database.txt', names = ['Email', 'Password', 'AccountNumber', 'Balance']) # dataframe
@@ -24,6 +26,7 @@ class Client:
     def __init__(self, username, password):
         self.username = username
         self.password = password
+        self.df = df # dataframe
         self.connection = None
 
     def connect(self, host, port):
@@ -43,7 +46,7 @@ class Client:
         backend = default_backend()
         infoA = self.username
         hkdfA = HKDF(algorithm=hashes.SHA256(), length=32,
-                     salt=None, info=infoA, backend=backend)
+                     salt=None, info=infoA.encode('utf-8'), backend=backend)
         hkdfB = HKDF(algorithm=hashes.SHA256(), length=32,
                      salt=None, info=InfoBank, backend=backend)
         hs = SPAKE2_A(self.password)
@@ -68,10 +71,46 @@ class Client:
         self.close()
         return status
 
-    
-    def checkBalance(self, accountNumber, amount):
+    def ask_account(self, accountNumber, amount):
+        num=0
+        Lacc=[]
+        Lmon=[]
+        ind=1
+        for i in range(self.df.shape(0)):
+            if self.username == self.df.loc(i, self.username):
+                Lacc[i] = self.df.loc(i, accountNumber)
+                Lmon[i] = self.df.loc(i, amount)
 
-        a = df[(df['AccountNumber'] == accountNumber) & (df['Balance'] >= amount)]
+                num+=1
+        acc=Lacc[0]
+        if num>1:
+            print("please chose from these account wich one you would like to use:<\n")
+            while num >0:
+                print("Choix "+str(ind)+" =>Compte n°: "+str(Lacc[num-1])+" , amount avaible : "+str(Lmon[num-1]))
+                num=num-1
+                ind=ind+1
+            no=input()
+            acc=Lacc[len(Lacc-no)]
+        return(acc)
+
+    def checkBalance(self, accountNumber, amount):
+        a = self.df[(self.df['AccountNumber'] == accountNumber) & (self.df['Balance'] >= amount)] # Row of sender A
+
+        if not a.empty:
+            return True, a
+        else:
+            return False, a
+
+    def checkId(self):
+        a = self.df[(self.df['Email'] == self.username) & (self.df['Password'] == self.password)] # Row of sender A
+
+        if not a.empty:
+            return True, a
+        else:
+            return False, a
+
+    def checkSender(self, user, accountSender):
+        a = user[user['AccountNumber'] == accountSender]
         print(a)
 
         if not a.empty:
@@ -79,12 +118,52 @@ class Client:
         else:
             return False
 
+    def updateDataset(self, a, to, amount):
+
+        c = self.df[self.df['AccountNumber'] == to] # Row of receiver C
+
+        self.df.loc[a.index[0], 'Balance'] -= amount
+        self.df.loc[c.index[0], 'Balance'] += amount
+        print(self.df)
+        self.df.to_csv('result.txt', header=None, index=None, sep=',', mode='a')
+
+        return self.df
+
 
 if __name__ == "__main__":
     username = df.loc[1, 'Email']
     password = df.loc[1, 'Password']
     client = Client(username, password)
-    client.checkBalance('A002', 28)
+
+    accountSender = 'A002'
+    amount = 28
+
+    correctId, user = client.checkId()
+    print(user)
+
+    if correctId:
+        if client.checkSender(user, accountSender):
+            valid, a = client.checkBalance(accountSender, amount)
+
+            if valid:
+                df = client.updateDataset(a, 'B001', amount)
+    
+   
     client.connect(host, port)
     status = client.transfer(receiver, 999)
     print(status)
+
+    key = Fernet.generate_key()
+    f = Fernet(key)
+    token = f.encrypt(b'My secret Message.')
+    token
+    f.decrypt(token)
+
+    '''cipher = Encryption(key)
+    request = cipher.encrypt(json.dumps({
+        'sender': username,
+        'receiver': receiver,
+        'amount': amount
+    }))
+    send(request) # send the encrypted request to the server
+    status = receive() # check if the operation has been performed successfully'''
