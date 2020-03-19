@@ -4,6 +4,10 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 import threading
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+import json
 
 # some constants
 InfoBank = b"confirm_Bank"
@@ -52,16 +56,16 @@ class Client(threading.Thread):
         print(secretKey.hex())
         request = self.recv()
         nonce = os.urandom(16)
-        algorithm = algorithms.ChaCha20(key, nonce)
+        algorithm = algorithms.ChaCha20(secretKey, nonce)
         cipher = Cipher(algorithm, mode=None, backend=default_backend())
         decryptor = cipher.decryptor()
-        message = cipher.decryptor.update(request)
+        message = decryptor.update(request)
         liste = message.json()
         
 
 
         self.send(status)
-        return status
+        return liste
 
 def new_request(r):
     username = r.recvline().rstrip()
