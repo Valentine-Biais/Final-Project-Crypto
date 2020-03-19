@@ -151,6 +151,7 @@ if __name__ == "__main__":
     username = df.loc[1, 'Email']
     password = df.loc[1, 'Password']
     client = Client(username, password)
+    client.connect(host, port)
 
     accountSender = 'A002'
     amount = 28
@@ -166,21 +167,5 @@ if __name__ == "__main__":
                 df = client.updateDataset(a, 'B001', amount)
     
    
-    client.connect(host, port)
     status = client.transfer(receiver, 999)
     print(status)
-
-    key = Fernet.generate_key()
-    f = Fernet(key)
-    token = f.encrypt(b'My secret Message.')
-    token
-    f.decrypt(token)
-
-    '''cipher = Encryption(key)
-    request = cipher.encrypt(json.dumps({
-        'sender': username,
-        'receiver': receiver,
-        'amount': amount
-    }))
-    send(request) # send the encrypted request to the server
-    status = receive() # check if the operation has been performed successfully'''
