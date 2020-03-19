@@ -19,4 +19,17 @@ Thus we can use a AES 128 or AES 256 encryption and it so happens that that is t
 
 Also, we want to use an authenticated encryption. That's why we should not use AES-CBC. Indeed, **CBC is not an authenticated encryption mode**. Any unauthenticated encryption is theoretically vulnerable to Chosen Ciphertext Attacks (CCA), and in the case of CBC that isn’t just “theoretical”. CBC isn't as parallelizable as GCM for instance and lacks built-in authentication. Due to this, CBC is only really practical for encrypting local files that don't need random access.
 
+
+
+# Finishing the code
+
+The document ***final project.py*** is only a test for our functions:
+     
+    def checkBalance(df, accountNumber, amount) # check balance of the sender account number
+    def checkId(df, email, password) # user has input the correct identification
+    def checkSender(user, accountSender) # user has the right to transfer the money out of the account of the sender
+    def updateDataset(df, a, to, amount) # update the database 
+to check that everything work correctly.
+
+
 > BIAIS Valentine ; KEBRAT Erwan ; HARAJ TOUZANI Younes ; RIEUL Thibault
