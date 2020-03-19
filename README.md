@@ -29,7 +29,7 @@ The document ***final project.py*** is only a test for our functions:
     def checkId(df, email, password) # user has input the correct identification
     def checkSender(user, accountSender) # user has the right to transfer the money out of the account of the sender
     def updateDataset(df, a, to, amount) # update the database 
-to check that everything work correctly.
+to check that everything works correctly.
 
 
 > BIAIS Valentine ; KEBRAT Erwan ; HARAJ TOUZANI Younes ; RIEUL Thibault
