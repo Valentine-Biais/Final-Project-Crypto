@@ -50,7 +50,15 @@ class Client(threading.Thread):
         status = b'OK'
         secretKey = self.handshake()
         print(secretKey.hex())
-        # TODO: do your jobs here
+        request = self.recv()
+        nonce = os.urandom(16)
+        algorithm = algorithms.ChaCha20(key, nonce)
+        cipher = Cipher(algorithm, mode=None, backend=default_backend())
+        decryptor = cipher.decryptor()
+        message = cipher.decryptor.update(request)
+        liste = message.json()
+        
+
 
         self.send(status)
         return status

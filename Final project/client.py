@@ -6,6 +6,13 @@ from cryptography.hazmat.backends import default_backend
 import pandas as pd 
 import json
 from cryptography.fernet import Fernet
+import json
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+
+
+
+
 
 # import the full dataset
 df = pd.read_csv('database.txt', names = ['Email', 'Password', 'AccountNumber', 'Balance']) # dataframe
@@ -64,9 +71,19 @@ class Client:
     def transfer(self, to, amount):
         secretKey = self.handshake()
         print(secretKey.hex())
-        # TODO: transfer `amount` of money from your balance to `to`.
+        # TODO: transfer amount of money from your balance to to.
 
+        nonce = os.urandom(16)
+        algorithm = algorithms.ChaCha20(key, nonce)
+        cipher = Cipher(algorithm, mode=None, backend=default_backend())
+        encryptor = cipher.encryptor()
+        request = cipher.encryptor.update(json.dumps({
+        'sender': self,
+        'receiver': to,
+        'amount': amount
+        }))
 
+        self.send(request)
         status = self.recv()
         self.close()
         return status
