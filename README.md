@@ -27,7 +27,7 @@ The document ***final project.py*** is only a test for our functions:
      
     def checkBalance(df, accountNumber, amount) # check balance of the sender account number
     def checkId(df, email, password) # user has input the correct identification
-    def checkSender(user, accountSender) # user has the right to transfer the money out of the account of the sender
+    def checkSender(user, accountSender) # user has the right to transfer the money
     def updateDataset(df, a, to, amount) # update the database 
 to check that everything works correctly.
 
